@@ -12,7 +12,6 @@ import (
 	"os"
 	"path/filepath"
 	"syscall"
-
 )
 
 // todo add delete temp function

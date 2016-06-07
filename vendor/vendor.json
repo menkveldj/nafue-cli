@@ -9,10 +9,36 @@
 			"revisionTime": "2016-06-02T08:47:49Z"
 		},
 		{
-			"checksumSHA1": "iTXzCSbvEKWTWm44V8WMaahy/ls=",
+			"checksumSHA1": "NnTNZ7yuUKqLdwsn2nU06FaYprE=",
 			"path": "github.com/menkveldj/nafue",
-			"revision": "95a868fe15203b756b67c8263f8450d9e506239d",
-			"revisionTime": "2016-04-13T15:52:15Z"
+			"revision": "9387e23c577a8d14561bdfb7d97608673599edf2",
+			"revisionTime": "2016-06-07T15:35:08Z",
+			"version": "=develop",
+			"versionExact": "develop"
+		},
+		{
+			"checksumSHA1": "brZ0auZKDSECIRRDpXqOkWxl5RM=",
+			"path": "github.com/menkveldj/nafue-api/models/display",
+			"revision": "a8011ed10a0757f758ec0e9061ce7757cf3c68a7",
+			"revisionTime": "2016-06-07T15:33:11Z",
+			"version": "=develop",
+			"versionExact": "develop"
+		},
+		{
+			"checksumSHA1": "mnHyCKTFZtJ+np5oRvJWCLjMohc=",
+			"path": "github.com/menkveldj/nafue/config",
+			"revision": "9387e23c577a8d14561bdfb7d97608673599edf2",
+			"revisionTime": "2016-06-07T15:35:08Z",
+			"version": "=develop",
+			"versionExact": "develop"
+		},
+		{
+			"checksumSHA1": "l9a6iZiFIvnI3m5kbxIhmYFMTuw=",
+			"path": "github.com/menkveldj/nafue/models",
+			"revision": "9387e23c577a8d14561bdfb7d97608673599edf2",
+			"revisionTime": "2016-06-07T15:35:08Z",
+			"version": "=develop",
+			"versionExact": "develop"
 		},
 		{
 			"checksumSHA1": "DJCVU0UQUscYmbZmhT+YhE0gRek=",
@@ -21,10 +47,20 @@
 			"revisionTime": "2016-05-27T18:54:26Z"
 		},
 		{
+			"checksumSHA1": "1MGpGDQqnUoRpv7VEcQrXOBydXE=",
+			"path": "golang.org/x/crypto/pbkdf2",
+			"revision": "89d9e62992539701a49a19c52ebb33e84cbbe80f",
+			"revisionTime": "2016-06-03T20:06:38Z"
+		},
+		{
 			"checksumSHA1": "N5fb5y92DFIP+wUhi1rSwPp9vyk=",
 			"path": "golang.org/x/crypto/ssh/terminal",
 			"revision": "b6789ab629056511030d652d851e7dc10c9e9c9e",
 			"revisionTime": "2016-05-04T15:20:23Z"
+		},
+		{
+			"path": "nafue/config",
+			"revision": ""
 		}
 	],
 	"rootPath": "nafue-cli"
