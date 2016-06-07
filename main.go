@@ -4,14 +4,15 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/menkveldj/nafue"
 	"github.com/urfave/cli"
 	"golang.org/x/crypto/ssh/terminal"
+	"github.com/menkveldj/nafue"
 	"io"
 	"log"
 	"os"
 	"path/filepath"
 	"syscall"
+
 )
 
 // todo add delete temp function
