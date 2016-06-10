@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "github.com/joho/godotenv/autoload"
 	"bytes"
 	"errors"
 	"fmt"
@@ -12,12 +13,13 @@ import (
 	"os"
 	"path/filepath"
 	"syscall"
+	"github.com/menkveldj/nafue/config"
 )
 
 // todo add delete temp function
 func main() {
 	// setup env as needed
-	nafue.Init()
+	nafue.Init(getConfig())
 
 	app := cli.NewApp()
 	app.Name = "Nafue"
@@ -119,7 +121,10 @@ func logError(err error) {
 	fmt.Errorf("%s\n", err)
 }
 
-//salt:  [823823226, 793384892]
-//salt b64:  MRqLei9KF7w=
-//iv:  [-1726315756, -750854000, -575834770, -1005289789, -875997976, 1972462144, 348864951, -1912938221]
-//iv b64:  mRqDFNM+4JDdrXVuxBR+w8vJVOh1kWJAFMtBt4364RM=
+func getConfig() config.Config{
+	env := os.Getenv("NAFUE_ENV")
+	if env == "development" {
+		return config.Development()
+	}
+	return config.Production()
+}
