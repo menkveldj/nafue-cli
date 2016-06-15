@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 )
 
-func CreateTempFile() io.WriterAt {
+func CreateTempFile() io.ReadWriteSeeker {
 	usr, err := user.Current()
 	if err != nil {
 		fmt.Println(err.Error())

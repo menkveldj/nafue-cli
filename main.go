@@ -13,6 +13,7 @@ import (
 	"syscall"
 	"github.com/menkveldj/nafue/config"
 	"github.com/menkveldj/nafue-cli/utility"
+	"io"
 )
 
 // todo add delete temp function
@@ -24,56 +25,11 @@ func main() {
 	app.Name = "Nafue"
 	app.Usage = "Anonymous, secure file transfers that self destruct after first use or 24 hours using client side encryption."
 	app.Commands = []cli.Command{
-		//{
-		//	Name:  "get",
-		//	Usage: "get [file]",
-		//	Action: func(c *cli.Context) error {
-		//
-		//		// verify url exists
-		//		url := c.Args().First()
-		//		if url == "" {
-		//			fmt.Printf("You must enter a url")
-		//			os.Exit(0)
-		//		}
-		//		// get file from url
-		//		body, header, err := nafue.TryGetURL(url)
-		//		if err != nil {
-		//			fmt.Printf("File never existed or was deleted.\n")
-		//			os.Exit(0)
-		//		}
-		//
-		//		// decrypt func
-		//		decrypt := func() (io.Reader, string, error) {
-		//			pass, err := promptPassword()
-		//			if err != nil {
-		//				fmt.Printf("Unable to decrypt file.\n")
-		//				// return bytes.NewBufferString(""), "", err
-		//				os.Exit(0)
-		//			}
-		//			return nafue.TryDecrypt(body, header, pass)
-		//		}
-		//
-		//		// do decrypt
-		//		var r io.Reader
-		//		var name string
-		//		i := 0
-		//		for r, name, err = decrypt(); err != nil; i++ {
-		//			fmt.Printf("%s\n", err)
-		//			if i == 3 {
-		//				fmt.Printf("To many failed attempts. File was deleted.\n")
-		//				os.Exit(0)
-		//			}
-		//		}
-		//		out, err := os.Create(name)
-		//		if err != nil {
-		//			panic(err)
-		//		}
-		//		io.Copy(out, r)
-		//		fmt.Printf("File saved to: %s\n", name)
-		//
-		//		return nil
-		//	},
-		//},
+		{
+			Name:  "get",
+			Usage: "get [file]",
+			Action: getFile,
+		},
 		{
 			Name:  "share",
 			Usage: "share [file]",
@@ -86,6 +42,53 @@ func main() {
 	}
 
 	app.Run(os.Args)
+}
+
+func getFile(c *cli.Context) error {
+
+		//// verify url exists
+		//url := c.Args().First()
+		//if url == "" {
+		//	fmt.Printf("You must enter a url")
+		//	os.Exit(0)
+		//}
+		//// get file from url
+		//body, header, err := nafue.TryGetURL(url)
+		//if err != nil {
+		//	fmt.Printf("File never existed or was deleted.\n")
+		//	os.Exit(0)
+		//}
+		//
+		//// decrypt func
+		//decrypt := func() (io.Reader, string, error) {
+		//	pass, err := promptPassword()
+		//	if err != nil {
+		//		fmt.Printf("Unable to decrypt file.\n")
+		//		// return bytes.NewBufferString(""), "", err
+		//		os.Exit(0)
+		//	}
+		//	return nafue.TryDecrypt(body, header, pass)
+		//}
+		//
+		//// do decrypt
+		//var r io.Reader
+		//var name string
+		//i := 0
+		//for r, name, err = decrypt(); err != nil; i++ {
+		//	fmt.Printf("%s\n", err)
+		//	if i == 3 {
+		//		fmt.Printf("To many failed attempts. File was deleted.\n")
+		//		os.Exit(0)
+		//	}
+		//}
+		//out, err := os.Create(name)
+		//if err != nil {
+		//	panic(err)
+		//}
+		//io.Copy(out, r)
+		//fmt.Printf("File saved to: %s\n", name)
+
+		return nil
 }
 
 func shareFile(c *cli.Context) error {
@@ -116,13 +119,12 @@ func shareFile(c *cli.Context) error {
 	for pass, err = promptPassword(); err != nil; {
 		fmt.Printf("Can't Read Password: %s\n", err.Error())
 	}
-	err = nafue.SealFile(f, sf, fileInfo, filepath.Base(file), pass)
+	shareUrl, err := nafue.SealFile(f, sf, fileInfo, filepath.Base(file), pass)
 	if err != nil {
 		logError(err)
 		return err
 	}
-	//shareURL, err := nafue.SealFile(f, fstat.Size(), filepath.Base(file), pass)
-	//fmt.Println("Share Link: ", shareURL)
+	fmt.Println("Share Link: ", shareUrl)
 	return nil
 }
 
@@ -146,8 +148,13 @@ func logError(err error) {
 
 func getConfig() config.Config {
 	env := os.Getenv("NAFUE_ENV")
-	if env == "development" {
+	switch env {
+
+	case "development":
 		return config.Development()
+	case "local":
+		return config.Local()
+	default:
+		return config.Production()
 	}
-	return config.Production()
 }
