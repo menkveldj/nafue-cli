@@ -13,10 +13,8 @@ import (
 	"syscall"
 	"github.com/menkveldj/nafue/config"
 	"github.com/menkveldj/nafue-cli/utility"
-	"io"
 )
 
-// todo add delete temp function
 func main() {
 	// setup env as needed
 	nafue.Init(getConfig())
@@ -55,6 +53,8 @@ func getFile(c *cli.Context) error {
 
 	// get temp file
 	secureData := utility.CreateTempFile()
+	defer secureData.Close()
+	//defer utility.DeleteTempFile(secureData.Name())
 
 	// get file from url
 	err := nafue.GetFile(url, secureData)
@@ -105,11 +105,12 @@ func shareFile(c *cli.Context) error {
 
 	// open file for reading
 	f, err := os.Open(file)
+	defer f.Close()
+
 	if err != nil {
 		logError(err)
 		return err
 	}
-	defer f.Close()
 
 	// get status about file
 	fileInfo, err := f.Stat()
@@ -122,7 +123,7 @@ func shareFile(c *cli.Context) error {
 	sf := utility.CreateTempFile()
 	defer sf.Close()
 	defer utility.DeleteTempFile(sf.Name())
-	
+
 	var pass string
 	for pass, err = promptPassword(); err != nil; {
 		fmt.Printf("Can't Read Password: %s\n", err.Error())
