@@ -104,7 +104,7 @@ func shareFile(c *cli.Context) error {
 	}
 
 	// get status about file
-	fstat, err := f.Stat()
+	fileInfo, err := f.Stat()
 	if err != nil {
 		logError(err)
 		return err
@@ -116,7 +116,7 @@ func shareFile(c *cli.Context) error {
 	for pass, err = promptPassword(); err != nil; {
 		fmt.Printf("Can't Read Password: %s\n", err.Error())
 	}
-	err = nafue.SealFile(f, sf, fstat.Size(), filepath.Base(file), pass)
+	err = nafue.SealFile(f, sf, fileInfo, filepath.Base(file), pass)
 	if err != nil {
 		logError(err)
 		return err
