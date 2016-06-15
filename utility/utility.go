@@ -5,12 +5,11 @@ import (
 	"crypto/rand"
 	"os"
 	"fmt"
-	"io"
 	"os/user"
 	"path/filepath"
 )
 
-func CreateTempFile() io.ReadWriteSeeker {
+func CreateTempFile() *os.File {
 	usr, err := user.Current()
 	if err != nil {
 		fmt.Println(err.Error())
@@ -37,6 +36,14 @@ func CreateTempFile() io.ReadWriteSeeker {
 	}
 
 	return w
+}
+
+func DeleteTempFile(fileName string) error{
+	err := os.Remove(fileName)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func GenerateRandomBytes(n int) ([]byte, error) {

@@ -46,49 +46,53 @@ func main() {
 
 func getFile(c *cli.Context) error {
 
-		//// verify url exists
-		//url := c.Args().First()
-		//if url == "" {
-		//	fmt.Printf("You must enter a url")
-		//	os.Exit(0)
-		//}
-		//// get file from url
-		//body, header, err := nafue.TryGetURL(url)
-		//if err != nil {
-		//	fmt.Printf("File never existed or was deleted.\n")
-		//	os.Exit(0)
-		//}
-		//
-		//// decrypt func
-		//decrypt := func() (io.Reader, string, error) {
-		//	pass, err := promptPassword()
-		//	if err != nil {
-		//		fmt.Printf("Unable to decrypt file.\n")
-		//		// return bytes.NewBufferString(""), "", err
-		//		os.Exit(0)
-		//	}
-		//	return nafue.TryDecrypt(body, header, pass)
-		//}
-		//
-		//// do decrypt
-		//var r io.Reader
-		//var name string
-		//i := 0
-		//for r, name, err = decrypt(); err != nil; i++ {
-		//	fmt.Printf("%s\n", err)
-		//	if i == 3 {
-		//		fmt.Printf("To many failed attempts. File was deleted.\n")
-		//		os.Exit(0)
-		//	}
-		//}
-		//out, err := os.Create(name)
-		//if err != nil {
-		//	panic(err)
-		//}
-		//io.Copy(out, r)
-		//fmt.Printf("File saved to: %s\n", name)
+	// verify url exists
+	url := c.Args().First()
+	if url == "" {
+		fmt.Printf("You must enter a url")
+		os.Exit(0)
+	}
 
-		return nil
+	// get temp file
+	secureData := utility.CreateTempFile()
+
+	// get file from url
+	err := nafue.GetFile(url, secureData)
+	if err != nil {
+		fmt.Printf("File never existed or was deleted.\n")
+		os.Exit(0)
+	}
+	//
+	//// decrypt func
+	//decrypt := func() (io.Reader, string, error) {
+	//	pass, err := promptPassword()
+	//	if err != nil {
+	//		fmt.Printf("Unable to decrypt file.\n")
+	//		// return bytes.NewBufferString(""), "", err
+	//		os.Exit(0)
+	//	}
+	//	return nafue.TryDecrypt(body, header, pass)
+	//}
+	//
+	//// do decrypt
+	//var r io.Reader
+	//var name string
+	//i := 0
+	//for r, name, err = decrypt(); err != nil; i++ {
+	//	fmt.Printf("%s\n", err)
+	//	if i == 3 {
+	//		fmt.Printf("To many failed attempts. File was deleted.\n")
+	//		os.Exit(0)
+	//	}
+	//}
+	//out, err := os.Create(name)
+	//if err != nil {
+	//	panic(err)
+	//}
+	//io.Copy(out, r)
+	//fmt.Printf("File saved to: %s\n", name)
+
+	return nil
 }
 
 func shareFile(c *cli.Context) error {
@@ -105,6 +109,7 @@ func shareFile(c *cli.Context) error {
 		logError(err)
 		return err
 	}
+	defer f.Close()
 
 	// get status about file
 	fileInfo, err := f.Stat()
@@ -115,11 +120,14 @@ func shareFile(c *cli.Context) error {
 
 	// open file handle for writing
 	sf := utility.CreateTempFile()
+	defer sf.Close()
+	defer utility.DeleteTempFile(sf.Name())
+	
 	var pass string
 	for pass, err = promptPassword(); err != nil; {
 		fmt.Printf("Can't Read Password: %s\n", err.Error())
 	}
-	shareUrl, err := nafue.SealFile(f, sf, fileInfo, filepath.Base(file), pass)
+	shareUrl, err := nafue.SealShareFile(f, sf, fileInfo, filepath.Base(file), pass)
 	if err != nil {
 		logError(err)
 		return err
