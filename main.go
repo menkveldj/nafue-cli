@@ -13,6 +13,7 @@ import (
 	"syscall"
 	"github.com/menkveldj/nafue/config"
 	"github.com/menkveldj/nafue-cli/utility"
+	"io"
 )
 
 func main() {
@@ -54,25 +55,32 @@ func getFile(c *cli.Context) error {
 	// get temp file
 	secureData := utility.CreateTempFile()
 	defer secureData.Close()
+
+	// get status about file
+	fileInfo, err := secureData.Stat()
+	if err != nil {
+		logError(err)
+		return err
+	}
 	//defer utility.DeleteTempFile(secureData.Name())
 
 	// get file from url
-	err := nafue.GetFile(url, secureData)
+	fileHeader, err := nafue.GetFile(url, secureData)
 	if err != nil {
 		fmt.Printf("File never existed or was deleted.\n")
 		os.Exit(0)
 	}
-	//
-	//// decrypt func
-	//decrypt := func() (io.Reader, string, error) {
-	//	pass, err := promptPassword()
-	//	if err != nil {
-	//		fmt.Printf("Unable to decrypt file.\n")
-	//		// return bytes.NewBufferString(""), "", err
-	//		os.Exit(0)
-	//	}
-	//	return nafue.TryDecrypt(body, header, pass)
-	//}
+
+	// tryUnseal func
+	attemptUnseal := func() (io.Reader, string, error) {
+		pass, err := promptPassword()
+		if err != nil {
+			fmt.Printf("Unable to decrypt file.\n")
+			os.Exit(0)
+		}
+		return nafue.UnsealFile(secureData, pass, fileHeader, fileInfo)
+	}
+	attemptUnseal()
 	//
 	//// do decrypt
 	//var r io.Reader
