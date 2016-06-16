@@ -13,7 +13,6 @@ import (
 	"syscall"
 	"github.com/menkveldj/nafue/config"
 	"github.com/menkveldj/nafue-cli/utility"
-	"io"
 )
 
 func main() {
@@ -72,13 +71,18 @@ func getFile(c *cli.Context) error {
 	}
 
 	// tryUnseal func
-	attemptUnseal := func() (io.Reader, string, error) {
+	attemptUnseal := func() error{
 		pass, err := promptPassword()
 		if err != nil {
 			fmt.Printf("Unable to decrypt file.\n")
 			os.Exit(0)
 		}
-		return nafue.UnsealFile(secureData, pass, fileHeader, fileInfo)
+		err = nafue.UnsealFile(secureData, pass, fileHeader, fileInfo)
+		if err != nil {
+			return err
+		}
+
+		return nil
 	}
 	attemptUnseal()
 	//
