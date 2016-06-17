@@ -84,7 +84,11 @@ func getFile(c *cli.Context) error {
 
 		return nil
 	}
-	attemptUnseal()
+	err = attemptUnseal()
+	if err != nil {
+		fmt.Printf("Error decrypting file.\n", err)
+		os.Exit(0)
+	}
 	//
 	//// do decrypt
 	//var r io.Reader
