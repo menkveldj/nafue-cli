@@ -41,53 +41,60 @@ func main() {
 }
 
 func getFile(c *cli.Context) error {
+	// verify url exists
+	url := c.Args().First()
+	if url == "" {
+		fmt.Printf("You must enter a url\n")
+		os.Exit(0)
+	}
 
-	//// verify url exists
-	//url := c.Args().First()
-	//if url == "" {
-	//	fmt.Printf("You must enter a url")
-	//	os.Exit(0)
-	//}
-	//
-	//// get temp file
-	//secureData := utility.CreateTempFile()
-	//defer secureData.Close()
-	//
-	//// get status about file
-	//fileInfo, err := secureData.Stat()
-	//if err != nil {
-	//	fmt.Println(err)
-	//	return err
-	//}
-	////defer utility.DeleteTempFile(secureData.Name())
-	//
-	//// get file from url
-	//fileHeader, err := nafue.GetFile(url, secureData)
-	//if err != nil {
-	//	fmt.Printf("File never existed or was deleted.\n")
-	//	os.Exit(0)
-	//}
-	//
-	//// tryUnseal func
-	//attemptUnseal := func() error{
-	//	pass, err := promptPassword()
-	//	if err != nil {
-	//		fmt.Printf("Unable to decrypt file.\n")
-	//		os.Exit(0)
-	//	}
-	//	err = nafue.UnsealFile(secureData, pass, fileHeader, fileInfo)
-	//	if err != nil {
-	//		return err
-	//	}
-	//
-	//	return nil
-	//}
-	//err = attemptUnseal()
-	//if err != nil {
-	//	fmt.Printf("Error decrypting file.\n", err)
-	//	os.Exit(0)
-	//}
+	// get file from url
+	fileHeader, secureFile, err := nafue.GetFile(url)
+	if err != nil {
+		fmt.Printf("File never existed or was deleted.\n")
+		os.Exit(0)
+	}
+
+	// tryUnseal func
+	var fileUri string
+	attemptUnseal := func() error {
+		pass, err := promptPassword()
+		if err != nil {
+			fmt.Printf("Unable to decrypt file.\n")
+			os.Exit(0)
+		}
+		fileUri, err = nafue.UnsealFile(secureFile, pass, fileHeader)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
+	attempts := 0
+	for {
+		// after 3 tries delete everything and quite
+		if attempts >= 3 {
+			fmt.Println("To many attempts. Deleting all temporary data.")
+			os.Remove(secureFile)
+			os.Exit(0)
+		}
+
+		// try to do unseal
+		err = attemptUnseal()
+		if err != nil && err != nafue.C_DECRYPT_UNAUTHENTICATED {
+			fmt.Printf("Error decrypting file.\n", err)
+			os.Exit(0)
+		} else if err == nafue.C_DECRYPT_UNAUTHENTICATED {
+			fmt.Println("Couldn't Authorize Data. Try entering your password again.")
+			attempts++
+		} else {
+			break
+		}
+
+	}
+	fmt.Println("FileUri: ", fileUri)
 	return nil
+
 }
 
 func shareFile(c *cli.Context) error {
