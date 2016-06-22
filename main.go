@@ -92,7 +92,7 @@ func getFile(c *cli.Context) error {
 		}
 
 	}
-	fmt.Println("FileUri: ", fileUri)
+	fmt.Println("FileName: '" +fileUri+"'")
 	return nil
 
 }
