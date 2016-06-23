@@ -41,13 +41,16 @@ func main() {
 }
 
 func getFile(c *cli.Context) error {
-	// verify url exists
+	// verify args exists
 	url := c.Args().First()
 	if url == "" {
 		fmt.Printf("You must enter a url\n")
 		os.Exit(0)
 	}
-
+	pathToSave := c.Args().Get(1)
+	if pathToSave == "" || pathToSave == "." || pathToSave == "./" {
+		pathToSave = "./"
+	}
 	// get file from url
 	fileHeader, secureFile, err := nafue.GetFile(url)
 	if err != nil {
@@ -60,10 +63,10 @@ func getFile(c *cli.Context) error {
 	attemptUnseal := func() error {
 		pass, err := promptPassword()
 		if err != nil {
-			fmt.Printf("Unable to decrypt file.\n")
+			fmt.Printf("Password required. Please try again.\n")
 			os.Exit(0)
 		}
-		fileUri, err = nafue.UnsealFile(secureFile, pass, fileHeader)
+		fileUri, err = nafue.UnsealFile(secureFile, pass, fileHeader, pathToSave)
 		if err != nil {
 			return err
 		}
@@ -82,17 +85,18 @@ func getFile(c *cli.Context) error {
 		// try to do unseal
 		err = attemptUnseal()
 		if err != nil && err != nafue.C_DECRYPT_UNAUTHENTICATED {
-			fmt.Printf("Error decrypting file.\n", err)
+			fmt.Printf("Error decrypting file. Cleaning temp files for security. All Data will be lost.\n", err)
 			os.Exit(0)
 		} else if err == nafue.C_DECRYPT_UNAUTHENTICATED {
 			fmt.Println("Couldn't Authorize Data. Try entering your password again.")
 			attempts++
-		} else {
-			break
+		} else { // good, move on
+			fmt.Println("File Saved To: " + fileUri)
+			break;
 		}
 
 	}
-	fmt.Println("FileName: '" +fileUri+"'")
+
 	return nil
 
 }
